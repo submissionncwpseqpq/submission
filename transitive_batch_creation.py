@@ -30,10 +30,10 @@ def get_batch_sims(queries, galleries, labels_dict, G, transitive_weight_beta):
 
 def get_batch_item_sims(item, queries, galleries, labels_dict, G, transitive_weight_beta):
     query_values = [
-        compare_batch_item_sims(item, query, labels_dict, G, alpha=transitive_weight_beta) for query in queries
+        compare_batch_item_sims(item, query, labels_dict, G, beta=transitive_weight_beta) for query in queries
     ]
     gallery_values = [
-        compare_batch_item_sims(item, gallery, labels_dict, G, alpha=transitive_weight_beta) for gallery in galleries
+        compare_batch_item_sims(item, gallery, labels_dict, G, beta=transitive_weight_beta) for gallery in galleries
     ]
 
     values = [*query_values, *gallery_values]
@@ -41,7 +41,7 @@ def get_batch_item_sims(item, queries, galleries, labels_dict, G, transitive_wei
     return values
 
 
-def compare_batch_item_sims(item, other_item, labels_dict, G, alpha=0.7):
+def compare_batch_item_sims(item, other_item, labels_dict, G, beta=0.7):
     value = UNKNOWN_VALUE
 
     if item == other_item:
@@ -58,10 +58,10 @@ def compare_batch_item_sims(item, other_item, labels_dict, G, alpha=0.7):
                 if path_length == math.inf:
                     value == 0
                 else:
-                    if alpha == 0:
-                        value = 1 # When alpha=1, we treat transitive labels as "non-soft" - the same as annotated positives, Note that this is only relevant if max-positive-length > 1
+                    if beta == 0:
+                        value = 1 # When beta=1, we treat transitive labels as "non-soft" - the same as annotated positives, Note that this is only relevant if max-positive-length > 1
                     else:
-                        value = math.exp(-alpha * path_length)
+                        value = math.exp(-beta * path_length)
                     
         except KeyError:
             pass
@@ -77,6 +77,3 @@ def get_shortest_length(G, node1, node2):
         return math.inf
         
     return result
-
-
-
